@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corrected Padding Checklist</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Public Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* CHANGED: Aligns content to the top, removing large top/bottom padding */
+            background-color: #36150f;
+            margin: 0;
+        }
+
+        #checklist {
+            /* Adjusted properties for transparent/removed container */
+            --background: transparent;
+            --text: white;
+            --check: #D65F02;
+            --disabled: #F3EECE;
+            --border-radius: 0px;
+
+            background: var(--background);
+            width: auto;
+            height: auto;
+            border-radius: var(--border-radius);
+            position: relative;
+            box-shadow: none;
+            /* CHANGED: padding to remove top/bottom, add left */
+            padding: 0px 0px 0px 20px; /* Top 0px, Right 10px (original), Bottom 0px, Left 30px (new) */
+            display: grid;
+            grid-template-columns: 40px auto;
+            align-items: left;
+            justify-content: left;
+            max-width: 600px;
+            box-sizing: border-box;
+            gap: 35px 0px;
+        }
+
+        #checklist label {
+            color: var(--text);
+            position: relative;
+            cursor: pointer;
+            display: grid;
+            align-items: center;
+            width: fit-content;
+            transition: color 0.3s ease;
+            margin-right: 25px;
+            font-size: 1.15em;
+        }
+
+        #checklist label::before, #checklist label::after {
+            content: "";
+            position: absolute;
+        }
+
+        #checklist label::before {
+            height: 3px;
+            width: 10px;
+            left: -35px;
+            background: var(--check);
+            border-radius: 2px;
+            transition: background 0.3s ease;
+        }
+
+        #checklist label:after {
+            height: 6px;
+            width: 6px;
+            top: 10px;
+            left: -32px;
+            border-radius: 50%;
+        }
+
+        #checklist input[type="checkbox"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            position: relative;
+            height: 20px;
+            width: 20px;
+            outline: none;
+            border: 0;
+            margin: 0 20px 0 0;
+            cursor: pointer;
+            background: var(--background);
+            display: grid;
+            align-items: center;
+            margin-right: 25px;
+        }
+
+        #checklist input[type="checkbox"]::before, #checklist input[type="checkbox"]::after {
+            content: "";
+            position: absolute;
+            height: 3px;
+            top: auto;
+            background: var(--check);
+            border-radius: 2px;
+        }
+
+        #checklist input[type="checkbox"]::before {
+            width: 0px;
+            right: 60%;
+            transform-origin: right bottom;
+        }
+
+        #checklist input[type="checkbox"]::after {
+            width: 0px;
+            left: 40%;
+            transform-origin: left bottom;
+        }
+
+        #checklist input[type="checkbox"]:checked::before {
+            animation: check-01 0.4s ease forwards;
+        }
+
+        #checklist input[type="checkbox"]:checked::after {
+            animation: check-02 0.4s ease forwards;
+        }
+
+        #checklist input[type="checkbox"]:checked + label {
+            color: var(--disabled);
+            animation: move 0.3s ease 0.1s forwards;
+        }
+
+        #checklist input[type="checkbox"]:checked + label::before {
+            background: var(--disabled);
+            animation: slice 0.4s ease forwards;
+        }
+
+        #checklist input[type="checkbox"]:checked + label::after {
+            animation: firework 0.5s ease forwards 0.1s;
+        }
+
+        @keyframes move {
+            50% {
+                padding-left: 10px;
+                padding-right: 0px;
+            }
+            100% {
+                padding-right: 6px;
+            }
+        }
+
+        @keyframes slice {
+            60% {
+                width: 100%;
+                left: 6px;
+            }
+            100% {
+                width: 100%;
+                left: -3px;
+                padding-left: 0;
+            }
+        }
+
+        @keyframes check-01 {
+            0% {
+                width: 6px;
+                top: auto;
+                transform: rotate(0);
+            }
+            50% {
+                width: 0px;
+                top: auto;
+                transform: rotate(0);
+            }
+            51% {
+                width: 0px;
+                top: 10px;
+                transform: rotate(45deg);
+            }
+            100% {
+                width: 7px;
+                top: 10px;
+                transform: rotate(45deg);
+            }
+        }
+
+        @keyframes check-02 {
+            0% {
+                width: 6px;
+                top: auto;
+                transform: rotate(0);
+            }
+            50% {
+                width: 0px;
+                top: auto;
+                transform: rotate(0);
+            }
+            51% {
+                width: 0px;
+                top: 10px;
+                transform: rotate(-45deg);
+            }
+            100% {
+                width: 13px;
+                top: 10px;
+                transform: rotate(-45deg);
+            }
+        }
+
+        @keyframes firework {
+            0% {
+                opacity: 1;
+                box-shadow: 0 0 0 -3px var(--check), 0 0 0 -3px var(--check), 0 0 0 -3px var(--check), 0 0 0 -3px var(--check), 0 0 0 -3px var(--check), 0 0 0 -3px var(--check);
+            }
+            30% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                box-shadow: 0 -20px 0 0px var(--check), 18px -10px 0 0px var(--check), 18px 10px 0 0px var(--check), 0 20px 0 0px var(--check), -18px 10px 0 0px var(--check), -18px -10px 0 0px var(--check);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="checklist">
+        <input value="1" name="r" type="checkbox" id="01">
+        <label for="01">1+ quart of water per hour</label>
+        <input value="2" name="r" type="checkbox" id="02">
+        <label for="02">Wide-brimmed hat</label>
+        <input value="3" name="r" type="checkbox" id="03">
+        <label for="03">Sunglasses</label>
+        <input value="4" name="r" type="checkbox" id="04">
+        <label for="04">Breathable shirt</label>
+        <input value="5" name="r" type="checkbox" id="05">
+        <label for="05">Printed map</label>
+        <input value="6" name="r" type="checkbox" id="06">
+        <label for="06">High calorie snacks</label>
+        <input value="7" name="r" type="checkbox" id="07">
+        <label for="07">Sunscreen (SPF 30+)</label>
+        <input value="8" name="r" type="checkbox" id="08">
+        <label for="08">Tweezers</label>
+        <input value="11" name="r" type="checkbox" id="11">
+        <label for="11">First aid kit</label>
+    </div>
+
+
+                                    <script>
+                                        var injectMightyInteractiveJavascript = (options) => {
+    var _a;
+    options.document = (_a = options.document) !== null && _a !== void 0 ? _a : window.document;
+    const { key, document, postIsReadyMessage } = options;
+    if (document.getElementById('mighty-interactive-core-js')) {
+        return;
+    }
+    const script = document.createElement('script');
+    script.id = 'mighty-interactive-core-js';
+    // Once legacy blocks are removed, we can remove the following legacy messages:
+    //      MIGHTY_INTERACTIVE_LOAD
+    //  MIGHTY_INTERACTIVE
+    script.innerHTML = `
+        window.parent.postMessage({ type: 'MIGHTY_INTERACTIVE_LOAD', data: {key: '${key}'} }, '*');
+        window.parent.postMessage({type: 'MIGHTY_INTERACTIVE_LOADED'}, '*');
+
+        function postMightyInteractiveHeightReport(){
+            const height = document.documentElement.offsetHeight;
+
+            window.parent.postMessage(
+                {
+                    type: 'MIGHTY_INTERACTIVE_HEIGHT_REPORT',
+                    data: {
+                        height: height,
+                    },
+                },
+                '*'
+            );
+
+            window.parent.postMessage(
+                {
+                    type: 'MIGHTY_INTERACTIVE',
+                    data: {
+                        key: '${key}',
+                        height: height,
+                    },
+                },
+                '*'
+            );            
+        }
+
+        function initResizeObserver() {
+            postMightyInteractiveHeightReport();
+
+            new ResizeObserver(() => {
+                postMightyInteractiveHeightReport();
+            }).observe(document.documentElement);
+        }
+        if (document.readyState === 'complete') {
+            initResizeObserver();
+        } else {
+            document.onreadystatechange = () => {
+                if (document.readyState === 'complete') {
+                    initResizeObserver();
+                }
+            };
+        }
+
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'MIGHTY_INTERACTIVE_SCREENCAP') {
+                const html = event.data.data.html;
+                const domParser = new window.DOMParser();
+                const snapshot = domParser.parseFromString(html, 'text/html');
+                document.replaceChild(snapshot.documentElement, document.documentElement);
+            }
+        });
+    `;
+    if (postIsReadyMessage) {
+        script.innerHTML += `
+            window.parent.postMessage({type: 'MIGHTY_INTERACTIVE_READY'}, '*');
+        `;
+    }
+    document.body.appendChild(script);
+};
+
+                                        injectMightyInteractiveJavascript({
+                                            key: '172dc702-aef1-4427-9be4-2db3a4ffcba7',
+                                            postIsReadyMessage: true
+                                        })
+                                    </script>
+                                    <script>
+                                        
+                                    </script>
+                                    <style>
+                                        
+                                    </style>
+                                    </body>
+</html>

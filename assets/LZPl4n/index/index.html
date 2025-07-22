@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symptom Diagnosis Cards</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Import Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Karla:wght@600&family=Public+Sans:wght@500&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #36150f; /* Changed background color */
+            font-family: 'Public Sans', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            margin-top: 60px;
+            margin-bottom: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card-container {
+            position: relative;
+            width: 320px;
+            height: 420px;
+        }
+
+        .card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; 
+            align-items: center;
+            text-align: center;
+            padding: 24px; 
+            box-sizing: border-box; 
+            transition: transform 0.4s ease, opacity 0.3s ease;
+            user-select: none;
+            transform-origin: center center;
+        }
+
+        .card h4 {
+            color: #D65F02;
+            font-family: 'Karla', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 16px 0;
+            width: 100%;
+            text-align: left;
+        }
+        
+        .card-icon { 
+            font-size: 80px; 
+            color: #D65F02;
+            margin-top: 20%; /* Adjusted margin to move icon down */
+            margin-bottom: auto; 
+        }
+
+        .card p {
+            font-family: 'Public Sans', sans-serif;
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 1.4;
+            flex: 1; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10px; 
+            margin-top: auto; 
+        }
+
+        .buttons-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .buttons button {
+            width: 64px;
+            height: 64px;
+            border: none;
+            border-radius: 50%;
+            font-size: 26px;
+            cursor: pointer;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .buttons button:hover {
+            transform: scale(1.1);
+        }
+
+        #no-button {
+            color: red; 
+        }
+
+        #yes-button {
+            color: green; 
+        }
+        
+        /* Style for the retry button */
+        .retry-button {
+            margin-top: auto; 
+            padding: 10px 20px;
+            font-size: 16px;
+            font-family: 'Karla', sans-serif;
+            color: white;
+            background-color: #D65F02;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .retry-button:hover {
+            background-color: #b04e02; 
+        }
+
+        .card.offset-1 {
+            transform: scale(0.97) translateY(10px);
+            z-index: 2;
+        }
+
+        .card.offset-2 {
+            transform: scale(0.94) translateY(20px);
+            z-index: 1;
+        }
+
+        .card.top {
+            z-index: 3;
+        }
+
+        /* Styling for the final report text */
+        .final-card-content {
+            flex: 1; 
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; 
+            align-items: center;
+            padding: 10px 10px 0 10px; 
+            box-sizing: border-box; 
+            text-align: center;
+            overflow-y: auto; 
+        }
+
+        .final-card-content p {
+            font-size: 18px; 
+            margin: 0; 
+            line-height: 1.5;
+            text-align: center; 
+            font-weight: 500; 
+            color: inherit; 
+            flex: none; 
+        }
+
+        .final-card-content .dominant-symptom {
+            font-size: 32px; 
+            font-weight: 700;
+            color: #D65F02; 
+            margin-top: 10px; 
+            margin-bottom: 20px; 
+        }
+
+        .final-card-content .symptom-report-list {
+            width: 100%; 
+            text-align: left; 
+            margin-top: 0; 
+            padding-left: 0; 
+            font-size: 18px; 
+            font-weight: 500;
+        }
+
+        .final-card-content .symptom-report-list div {
+            margin-bottom: 5px; 
+        }
+
+        .final-card-content strong {
+            font-weight: 700; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="card-container" id="card-container"></div>
+        <div class="buttons-wrapper">
+            <div class="buttons">
+                <button id="no-button" aria-label="No"><i class="fas fa-times"></i></button>
+                <button id="yes-button" aria-label="Yes"><i class="fas fa-check"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            // Dehydration
+            {
+                category: "Dehydration",
+                text: "Does your mouth feel dry?",
+                iconClass: "fas fa-question", 
+                altText: "question mark"
+            },
+            {
+                category: "Dehydration",
+                text: "Do you feel lightheaded or dizzy?",
+                iconClass: "fas fa-question",
+                altText: "question mark"
+            },
+            {
+                category: "Dehydration",
+                text: "Do you have a dull headache?",
+                iconClass: "fas fa-question",
+                altText: "question mark"
+            },
+            {
+                category: "Dehydration",
+                text: "Is your pee dark yellow?",
+                iconClass: "fas fa-question", 
+                altText: "question mark"
+            },
+            {
+                category: "Dehydration",
+                text: "Are your muscles cramping up?",
+                iconClass: "fas fa-question", 
+                altText: "question mark"
+            },
+            // Overexertion
+            {
+                category: "Overexertion",
+                text: "Are you breathing fast and shallow?",
+                iconClass: "fas fa-question",
+                altText: "question mark"
+            },
+            {
+                category: "Overexertion",
+                text: "Do you feel nauseous or like you might throw up?",
+                iconClass: "fas fa-question",
+                altText: "question mark"
+            },
+            {
+                category: "Overexertion",
+                text: "Do your legs feel heavy or weak?",
+                iconClass: "fas fa-question",
+                altText: "question mark"
+            },
+            {
+                category: "Overexertion",
+                text: "Are you feeling cold or clammy, even in the heat?",
+                iconClass: "fas fa-question", 
+                altText: "question mark"
+            },
+            {
+                category: "Overexertion",
+                text: "Do you still feel wiped out after resting?",
+                iconClass: "fas fa-question",
+                altText: "question mark"
+            },
+            // Heatstroke
+            {
+                category: "Heatstroke",
+                text: "Are you feeling confused or foggy?",
+                iconClass: "fas fa-question",
+                altText: "question mark"
+            },
+            {
+                category: "Heatstroke",
+                text: "Are you having trouble thinking clearly or staying alert?",
+                iconClass: "fas fa-question", 
+                altText: "question mark"
+            },
+            {
+                category: "Heatstroke",
+                text: "Have you thrown up or felt close to it?",
+                iconClass: "fas fa-question",
+                altText: "question mark"
+            },
+            {
+                category: "Heatstroke",
+                text: "Is your heart pounding or racing fast?",
+                iconClass: "fas fa-question", 
+                altText: "question mark"
+            },
+            {
+                category: "Heatstroke",
+                text: "Have you fainted or come close?",
+                iconClass: "fas fa-question", 
+                altText: "question mark"
+            }
+        ];
+
+        const container = document.getElementById("card-container");
+        let currentIndex = 0;
+        let scores = {
+            Dehydration: 0,
+            Overexertion: 0,
+            Heatstroke: 0
+        };
+
+        function renderCards() {
+            container.innerHTML = "";
+            const buttonsWrapper = document.querySelector('.buttons-wrapper');
+            
+            if (currentIndex >= questions.length) {
+                buttonsWrapper.style.visibility = 'hidden'; 
+                displayFinalCard();
+                return;
+            }
+            
+            const stack = [];
+
+            for (let i = currentIndex; i < Math.min(currentIndex + 3, questions.length); i++) {
+                const card = document.createElement("div");
+                card.className = "card";
+                if (i === currentIndex) card.classList.add("top");
+                else if (i === currentIndex + 1) card.classList.add("offset-1");
+                else if (i === currentIndex + 2) card.classList.add("offset-2");
+
+                const question = questions[i];
+                
+                card.innerHTML = `
+                    <h4>Question ${i + 1} of ${questions.length}</h4>
+                    <i class="${question.iconClass} card-icon"></i>
+                    <p>${question.text}</p>
+                `;
+                stack.unshift(card);
+            }
+
+            stack.forEach(card => {
+                container.appendChild(card);
+                if (card.classList.contains("top")) enableSwipe(card);
+            });
+        }
+
+        function displayFinalCard() {
+            let diagnosisMessage = "";
+            let topCondition = "";
+            let maxScore = -1;
+            let conditionsWithMaxScore = [];
+
+            for (const condition in scores) {
+                if (scores[condition] > maxScore) {
+                    maxScore = scores[condition];
+                    topCondition = condition;
+                    conditionsWithMaxScore = [condition];
+                } else if (scores[condition] === maxScore && maxScore > 0) {
+                    conditionsWithMaxScore.push(condition);
+                }
+            }
+
+            if (maxScore > 0) {
+                if (conditionsWithMaxScore.length === 1) {
+                    diagnosisMessage = `You reported the most symptoms for`;
+                } else {
+                    diagnosisMessage = `You reported the most symptoms for`;
+                }
+            } else {
+                diagnosisMessage = "You didn't report many symptoms. If you're feeling unwell, it's always best to consult a healthcare professional.";
+            }
+
+            const doneCard = document.createElement("div");
+            doneCard.className = "card top";
+            
+            doneCard.innerHTML = `
+                <h4>Your Symptom Report</h4>
+                <div class="final-card-content"> 
+                    <p>${diagnosisMessage}</p>
+                    ${maxScore > 0 ? `<p class="dominant-symptom">${conditionsWithMaxScore.join(' & ')}</p>` : ''}
+                    <div class="symptom-report-list">
+                        <div><strong>Dehydration symptoms:</strong> ${scores.Dehydration}/5</div>
+                        <div><strong>Overexertion symptoms:</strong> ${scores.Overexertion}/5</div>
+                        <div><strong>Heatstroke symptoms:</strong> ${scores.Heatstroke}/5</div>
+                    </div>
+                </div>
+                <button id="retry-button" class="retry-button">Start Again</button>
+            `;
+            container.appendChild(doneCard);
+            
+            document.getElementById('retry-button').addEventListener('click', resetInteraction);
+        }
+        
+        function resetInteraction() {
+            currentIndex = 0;
+            scores = {
+                Dehydration: 0,
+                Overexertion: 0,
+                Heatstroke: 0
+            };
+            document.querySelector('.buttons-wrapper').style.visibility = 'visible';
+            renderCards();
+        }
+
+        function enableSwipe(card) {
+            let startX = 0, isDragging = false;
+
+            function onGestureEnd(e) {
+                if (!isDragging) return;
+                isDragging = false;
+                const endX = e.clientX || e.changedTouches[0].clientX;
+                const deltaX = endX - startX;
+                card.style.transition = 'transform 0.4s ease, opacity 0.3s ease';
+                if (Math.abs(deltaX) > 80) {
+                    swipeCard(deltaX > 0 ? 'right' : 'left');
+                } else {
+                    card.style.transform = "";
+                }
+                document.removeEventListener("mousemove", onGestureMove);
+                document.removeEventListener("mouseup", onGestureEnd);
+            }
+
+            function onGestureMove(e) {
+                if (!isDragging) return;
+                const currentX = e.clientX || e.touches[0].clientX;
+                const deltaX = currentX - startX;
+                card.style.transform = `translateX(${deltaX}px) rotate(${deltaX / 20}deg)`;
+            }
+
+            function onGestureStart(e) {
+                isDragging = true;
+                startX = e.clientX || e.touches[0].clientX;
+                card.style.transition = 'none';
+                document.addEventListener("mousemove", onGestureMove);
+                document.addEventListener("mouseup", onGestureEnd);
+            }
+
+            card.addEventListener("mousedown", onGestureStart);
+            card.addEventListener("touchstart", onGestureStart);
+            card.addEventListener("touchmove", onGestureMove);
+            card.addEventListener("touchend", onGestureEnd);
+        }
+
+        function swipeCard(direction) {
+            const card = container.querySelector(".card.top");
+            if (!card) return;
+            
+            if (direction === 'right') {
+                const currentQuestionCategory = questions[currentIndex].category;
+                scores[currentQuestionCategory]++;
+            }
+            
+            const isRight = direction === 'right';
+            card.style.transition = 'transform 0.4s ease, opacity 0.3s ease';
+            card.style.transform = `translateX(${isRight ? '150%' : '-150%'}) rotate(${isRight ? 20 : -20}deg)`;
+            card.style.opacity = "0";
+            
+            setTimeout(() => {
+                currentIndex++;
+                renderCards();
+            }, 300);
+        }
+
+        document.getElementById("yes-button").addEventListener("click", () => swipeCard('right'));
+        document.getElementById("no-button").addEventListener("click", () => swipeCard('left'));
+
+        renderCards();
+    </script>
+
+                                    <script>
+                                        var injectMightyInteractiveJavascript = (options) => {
+    var _a;
+    options.document = (_a = options.document) !== null && _a !== void 0 ? _a : window.document;
+    const { key, document, postIsReadyMessage } = options;
+    if (document.getElementById('mighty-interactive-core-js')) {
+        return;
+    }
+    const script = document.createElement('script');
+    script.id = 'mighty-interactive-core-js';
+    // Once legacy blocks are removed, we can remove the following legacy messages:
+    //      MIGHTY_INTERACTIVE_LOAD
+    //  MIGHTY_INTERACTIVE
+    script.innerHTML = `
+        window.parent.postMessage({ type: 'MIGHTY_INTERACTIVE_LOAD', data: {key: '${key}'} }, '*');
+        window.parent.postMessage({type: 'MIGHTY_INTERACTIVE_LOADED'}, '*');
+
+        function postMightyInteractiveHeightReport(){
+            const height = document.documentElement.offsetHeight;
+
+            window.parent.postMessage(
+                {
+                    type: 'MIGHTY_INTERACTIVE_HEIGHT_REPORT',
+                    data: {
+                        height: height,
+                    },
+                },
+                '*'
+            );
+
+            window.parent.postMessage(
+                {
+                    type: 'MIGHTY_INTERACTIVE',
+                    data: {
+                        key: '${key}',
+                        height: height,
+                    },
+                },
+                '*'
+            );            
+        }
+
+        function initResizeObserver() {
+            postMightyInteractiveHeightReport();
+
+            new ResizeObserver(() => {
+                postMightyInteractiveHeightReport();
+            }).observe(document.documentElement);
+        }
+        if (document.readyState === 'complete') {
+            initResizeObserver();
+        } else {
+            document.onreadystatechange = () => {
+                if (document.readyState === 'complete') {
+                    initResizeObserver();
+                }
+            };
+        }
+
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'MIGHTY_INTERACTIVE_SCREENCAP') {
+                const html = event.data.data.html;
+                const domParser = new window.DOMParser();
+                const snapshot = domParser.parseFromString(html, 'text/html');
+                document.replaceChild(snapshot.documentElement, document.documentElement);
+            }
+        });
+    `;
+    if (postIsReadyMessage) {
+        script.innerHTML += `
+            window.parent.postMessage({type: 'MIGHTY_INTERACTIVE_READY'}, '*');
+        `;
+    }
+    document.body.appendChild(script);
+};
+
+                                        injectMightyInteractiveJavascript({
+                                            key: '2cc757f1-0d86-467c-952f-c3850ecbc58c',
+                                            postIsReadyMessage: true
+                                        })
+                                    </script>
+                                    <script>
+                                        
+                                    </script>
+                                    <style>
+                                        
+                                    </style>
+                                    </body>
+</html>
